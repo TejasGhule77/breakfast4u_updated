@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Clock, Mail, Lock } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../services/api';
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,34 +15,16 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const response = await api.login({
         email: data.email,
         password: data.password
       });
 
-      if (authError) {
-        throw authError;
-      }
+      if (response.success) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      if (authData.user) {
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', authData.user.id)
-          .maybeSingle();
-
-        if (userError) {
-          console.error('User profile fetch error:', userError);
-        }
-
-        const userInfo = {
-          ...authData.user,
-          profile: userData
-        };
-
-        localStorage.setItem('user', JSON.stringify(userInfo));
-
-        if (userData?.role === 'owner') {
+        if (response.data.user.role === 'owner') {
           navigate('/owner-dashboard');
         } else {
           navigate('/');

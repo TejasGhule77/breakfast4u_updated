@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Clock, Mail, Lock, User, Store, Phone, MapPin } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../services/api';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,44 +19,22 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const userData = {
+        name: data.name,
         email: data.email,
+        phone: data.phone,
         password: data.password,
-        options: {
-          data: {
-            name: data.name,
-            phone: data.phone,
-            role: userType,
-            business_name: data.businessName || null,
-            address: data.address || null
-          }
-        }
-      });
+        role: userType,
+        businessName: userType === 'owner' ? data.businessName : undefined,
+        address: userType === 'owner' ? data.address : undefined
+      };
 
-      if (authError) {
-        throw authError;
+      const response = await api.register(userData);
+
+      if (response.success) {
+        alert(`Registration successful! Welcome ${data.name}! Please sign in.`);
+        navigate('/signin');
       }
-
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert([{
-            id: authData.user.id,
-            email: data.email,
-            name: data.name,
-            phone: data.phone,
-            role: userType,
-            business_name: data.businessName || null,
-            address: data.address || null
-          }]);
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-        }
-      }
-
-      alert(`Registration successful! Welcome ${data.name}! Please sign in.`);
-      navigate('/signin');
     } catch (error) {
       console.error('Registration error:', error);
       alert(error.message || 'Registration failed. Please try again.');
