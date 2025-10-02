@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Clock, Mail, Lock } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,39 +13,44 @@ const SignIn = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    
+
     try {
-      // Mock authentication logic with more users
-      const mockUsers = [
-        { email: 'user@example.com', password: 'password', role: 'user', name: 'John Doe' },
-        { email: 'owner@example.com', password: 'password', role: 'owner', name: 'Store Owner' },
-        { email: 'admin@breakfast4u.com', password: 'admin123', role: 'admin', name: 'Admin User' },
-        { email: 'shraddha@example.com', password: 'password123', role: 'owner', name: 'Shraddha Owner' },
-        { email: 'john@example.com', password: 'password123', role: 'user', name: 'John Customer' }
-      ];
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const user = mockUsers.find(u => u.email === data.email && u.password === data.password);
-      
-      if (user) {
-        // Store user info in localStorage (in real app, use proper auth)
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token', 'mock-jwt-token-' + user.role);
-        
-        if (user.role === 'owner') {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      if (authData.user) {
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', authData.user.id)
+          .maybeSingle();
+
+        if (userError) {
+          console.error('User profile fetch error:', userError);
+        }
+
+        const userInfo = {
+          ...authData.user,
+          profile: userData
+        };
+
+        localStorage.setItem('user', JSON.stringify(userInfo));
+
+        if (userData?.role === 'owner') {
           navigate('/owner-dashboard');
-        } else if (user.role === 'admin') {
-          navigate('/admin-dashboard');
         } else {
           navigate('/');
         }
-      } else {
-        alert('Invalid credentials. Try:\nUser: user@example.com / password\nOwner: owner@example.com / password\nAdmin: admin@breakfast4u.com / admin123');
       }
     } catch (error) {
-      alert('Login failed. Please try again.');
+      console.error('Login error:', error);
+      alert(error.message || 'Invalid credentials. Please try again.');
     } finally {
       setIsLoading(false);
     }

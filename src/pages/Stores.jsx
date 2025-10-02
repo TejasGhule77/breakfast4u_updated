@@ -293,8 +293,10 @@ const Stores = () => {
                   </div>
 
                   <div className="flex space-x-3">
-                    <button className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors duration-200">
+                    <button
                       onClick={() => navigate(`/menu?store=${store.name}`)}
+                      className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors duration-200"
+                    >
                       View Menu
                     </button>
                     <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-1">

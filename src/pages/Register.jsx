@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Clock, Mail, Lock, User, Store, Phone, MapPin } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,31 +17,49 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Registration data:', { ...data, userType });
-      
-      // Create user object
-      const newUser = {
-        name: data.name,
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
-        phone: data.phone,
-        role: userType,
-        businessName: data.businessName,
-        address: data.address
-      };
-      
-      // Store user info in localStorage
-      localStorage.setItem('user', JSON.stringify(newUser));
-      localStorage.setItem('token', 'mock-jwt-token-' + userType);
-      
-      alert(`Registration successful! Welcome ${data.name}!`);
+        password: data.password,
+        options: {
+          data: {
+            name: data.name,
+            phone: data.phone,
+            role: userType,
+            business_name: data.businessName || null,
+            address: data.address || null
+          }
+        }
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert([{
+            id: authData.user.id,
+            email: data.email,
+            name: data.name,
+            phone: data.phone,
+            role: userType,
+            business_name: data.businessName || null,
+            address: data.address || null
+          }]);
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+      }
+
+      alert(`Registration successful! Welcome ${data.name}! Please sign in.`);
       navigate('/signin');
     } catch (error) {
-      alert('Registration failed. Please try again.');
+      console.error('Registration error:', error);
+      alert(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
