@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { Phone, Mail, MapPin, Clock, Send, ChevronDown } from 'lucide-react';
+import { api } from '../services/api';
 
 const Contact = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   const contactInfo = [
@@ -64,11 +66,20 @@ const Contact = () => {
     }
   ];
 
-  const onSubmit = (data) => {
-    console.log('Form submitted:', data);
-    // Handle form submission here
-    alert('Thank you for your message! We\'ll get back to you soon.');
-    reset();
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const response = await api.submitContactForm(data);
+      if (response.success) {
+        alert('Thank you for your message! We\'ll get back to you soon.');
+        reset();
+      }
+    } catch (error) {
+      console.error('Contact form error:', error);
+      alert(error.message || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -272,10 +283,11 @@ const Contact = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 flex items-center justify-center space-x-2"
+                disabled={isSubmitting}
+                className="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-5 w-5" />
-                <span>Send Message</span>
+                <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
               </button>
             </form>
 

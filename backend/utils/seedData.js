@@ -65,11 +65,41 @@ const seedData = async () => {
       address: 'near Ram Mandir, Sakhrale'
     });
 
+    const owner3 = await User.create({
+      name: 'Tuljai Owner',
+      email: 'tuljai@example.com',
+      phone: '9876543213',
+      password: 'password123',
+      role: 'owner',
+      businessName: 'Tuljai Snacks',
+      address: 'near Bus Stand, Takari'
+    });
+
+    const owner4 = await User.create({
+      name: 'Mugdha Owner',
+      email: 'mugdha@example.com',
+      phone: '9876543214',
+      password: 'password123',
+      role: 'owner',
+      businessName: 'Mugdha Snacks',
+      address: 'Gandhi Chowk, Islampur'
+    });
+
+    const owner5 = await User.create({
+      name: 'Anil Owner',
+      email: 'anil@example.com',
+      phone: '9876543215',
+      password: 'password123',
+      role: 'owner',
+      businessName: 'Anil Snacks',
+      address: 'Station Road, Walwa'
+    });
+
     // Create sample users
     const user1 = await User.create({
       name: 'John Doe',
       email: 'john@example.com',
-      phone: '9876543212',
+      phone: '9876543216',
       password: 'password123',
       role: 'user'
     });
@@ -304,12 +334,88 @@ const seedData = async () => {
         features: ['Authentic', 'Takeout', 'Vegan Options'],
         popularItems: [createdMeals[1]._id, createdMeals[4]._id], // Pav Bhaji, Misal Pav
         images: ['Tuljai.jpg'],
-        owner: owner1._id,
+        owner: owner3._id,
         isActive: true,
         isVerified: true,
         deliveryRadius: 7,
         minimumOrder: 40,
         deliveryFee: 25
+      },
+      {
+        name: 'Mugdha Snacks',
+        description: 'Healthy snacks and fresh juices',
+        address: {
+          street: 'Gandhi Chowk',
+          area: 'Islampur',
+          city: 'Sangli',
+          state: 'Maharashtra',
+          pincode: '415409'
+        },
+        location: {
+          type: 'Point',
+          coordinates: [74.2800, 16.9500]
+        },
+        phone: '9876543214',
+        email: 'mugdha@example.com',
+        hours: {
+          monday: { open: '07:00', close: '21:00', closed: false },
+          tuesday: { open: '07:00', close: '21:00', closed: false },
+          wednesday: { open: '07:00', close: '21:00', closed: false },
+          thursday: { open: '07:00', close: '21:00', closed: false },
+          friday: { open: '07:00', close: '21:00', closed: false },
+          saturday: { open: '07:00', close: '21:00', closed: false },
+          sunday: { open: '08:00', close: '20:00', closed: false }
+        },
+        rating: 4.7,
+        reviewCount: 95,
+        specialties: ['Sweets', 'Dhokla', 'Vegan Options'],
+        features: ['Organic', 'Gluten-Free', 'Sustainable'],
+        popularItems: [createdMeals[0]._id], // Bhel Puri
+        images: ['https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=400'],
+        owner: owner4._id,
+        isActive: true,
+        isVerified: true,
+        deliveryRadius: 10,
+        minimumOrder: 60,
+        deliveryFee: 30
+      },
+      {
+        name: 'Anil Snacks',
+        description: 'Traditional breakfast and quick bites',
+        address: {
+          street: 'Station Road',
+          area: 'Walwa',
+          city: 'Sangli',
+          state: 'Maharashtra',
+          pincode: '416313'
+        },
+        location: {
+          type: 'Point',
+          coordinates: [74.5800, 16.9200]
+        },
+        phone: '9876543215',
+        email: 'anil@example.com',
+        hours: {
+          monday: { open: '05:00', close: '14:00', closed: false },
+          tuesday: { open: '05:00', close: '14:00', closed: false },
+          wednesday: { open: '05:00', close: '14:00', closed: false },
+          thursday: { open: '05:00', close: '14:00', closed: false },
+          friday: { open: '05:00', close: '14:00', closed: false },
+          saturday: { open: '05:00', close: '14:00', closed: false },
+          sunday: { open: '06:00', close: '13:00', closed: false }
+        },
+        rating: 4.3,
+        reviewCount: 78,
+        specialties: ['Light Food', 'Indian Classic', 'Milkshakes'],
+        features: ['Diner Style', 'Large Portions', 'Classic Menu'],
+        popularItems: [createdMeals[0]._id], // Bhel Puri
+        images: ['https://images.pexels.com/photos/6267/menu-restaurant-vintage-table.jpg?auto=compress&cs=tinysrgb&w=400'],
+        owner: owner5._id,
+        isActive: true,
+        isVerified: true,
+        deliveryRadius: 4,
+        minimumOrder: 35,
+        deliveryFee: 20
       }
     ];
 
@@ -323,8 +429,11 @@ const seedData = async () => {
     console.log(`- Stores: ${await Store.countDocuments()}`);
     console.log('\n🔐 Login credentials:');
     console.log('Admin: admin@breakfast4u.com / admin123');
-    console.log('Owner 1: shraddha@example.com / password123');
-    console.log('Owner 2: prakash@example.com / password123');
+    console.log('Owner 1 (Shraddha): shraddha@example.com / password123');
+    console.log('Owner 2 (Prakash): prakash@example.com / password123');
+    console.log('Owner 3 (Tuljai): tuljai@example.com / password123');
+    console.log('Owner 4 (Mugdha): mugdha@example.com / password123');
+    console.log('Owner 5 (Anil): anil@example.com / password123');
     console.log('User: john@example.com / password123');
 
     process.exit(0);

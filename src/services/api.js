@@ -69,4 +69,22 @@ export const api = {
 
     return data;
   },
+
+  async submitContactForm(formData) {
+    const response = await fetch(`${API_URL}/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to submit contact form');
+    }
+
+    return data;
+  },
 };
